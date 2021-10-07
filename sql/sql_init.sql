@@ -3,25 +3,27 @@ USE db1;
 
 CREATE TABLE USERS(
 
-    id VARCHAR(20) PRIMARY KEY,
+    ,
     nombre VARCHAR(40),
     edad int,
     fecha_nac DATE,
-    fecha_ins DATE,
+    fecha_ins DATETIME DEFAULT CURRENT_TIMESTAMP,
     grupos VARCHAR(100),
-    carac VARCHAR(100)
+    carac VARCHAR(100),
+    pass VARCHAR(100),
+    email VARCHAR(100)
 
 );
 
 
 CREATE TABLE ENCUESTA(
 
-    id VARCHAR(20) PRIMARY KEY,
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(40),
     restricciones VARCHAR(100),
-    fecha_inicio DATE,
-    fecha_final DATE,
-    propietario VARCHAR(20),
+    fecha_inicio DATETIME,
+    fecha_final DATETIME,
+    propietario INT,
 
     CONSTRAINT enc_users_fk FOREIGN KEY (propietario) REFERENCES USERS(id)
 
@@ -30,9 +32,10 @@ CREATE TABLE ENCUESTA(
 CREATE TABLE USERS_ENCUESTA(
 
     fecha_respuesta DATE,
+    respondida BOOLEAN,
 
-    user VARCHAR(20) PRIMARY KEY,
-    encuesta VARCHAR(20),
+    user INT PRIMARY KEY,
+    encuesta INT,
 
     CONSTRAINT ue_users_fk FOREIGN KEY (user) REFERENCES USERS(id),
     CONSTRAINT ue_encuesta_fk FOREIGN KEY (encuesta) REFERENCES ENCUESTA(id)
@@ -40,18 +43,18 @@ CREATE TABLE USERS_ENCUESTA(
 
 CREATE TABLE PREGUNTAS(
 
-    id VARCHAR(20) PRIMARY KEY,
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     pregunta VARCHAR(100),
-    encuesta VARCHAR(20),
+    encuesta INT,
 
     CONSTRAINT pre_encuesta_fk FOREIGN KEY (encuesta) REFERENCES ENCUESTA(id)
 );
 
 CREATE TABLE RESPUESTAS(
 
-    id VARCHAR(20) PRIMARY KEY,
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     respuesta VARCHAR(100),
-    pregunta VARCHAR(20),
+    pregunta INT,
 
     CONSTRAINT res_preguntas_fk FOREIGN KEY (pregunta) REFERENCES PREGUNTAS(id)
 

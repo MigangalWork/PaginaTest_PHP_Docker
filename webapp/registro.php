@@ -16,7 +16,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $email_err = "Username can only contain letters, numbers, and underscores.";
     } else{
         // Prepare a select statement
-        $sql = "SELECT id FROM usuarios WHERE email = ?";
+        $sql = "SELECT id FROM users WHERE email = ?";
 
         if($stmt = $mysqli->prepare($sql)){
             // Bind variables to the prepared statement as parameters
@@ -67,13 +67,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     if(empty($email_err) && empty($password_err) && empty($confirm_password_err)){
 
         // Prepare an insert statement
-        $sql = "INSERT INTO usuarios (email, passwd) VALUES (?, ?)";
+        $sql = "INSERT INTO users (id, email, pass) VALUES (?, ?, ?)";
 
         if($stmt = $mysqli->prepare($sql)){
             // Bind variables to the prepared statement as parameters
-            $stmt->bind_param("ss", $param_email, $param_password);
+            $stmt->bind_param("sss", $param_id, $param_email, $param_password);
 
             // Set parameters
+            $param_id = random_int(0, 1000000);
             $param_email = $email;
             $param_password = password_hash($password, PASSWORD_DEFAULT); // Creates a password hash
 

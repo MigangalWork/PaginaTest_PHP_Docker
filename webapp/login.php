@@ -35,7 +35,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     // Validate credentials
     if(empty($email_err) && empty($password_err)){
         // Prepare a select statement
-        $sql = "SELECT id, email, passwd FROM usuarios WHERE email = ?";
+        $sql = "SELECT id, email, pass FROM users WHERE email = ?";
         
         if($stmt = $mysqli->prepare($sql)){
             // Bind variables to the prepared statement as parameters
@@ -53,8 +53,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 if($result->num_rows == 1){
                     // Bind result variables
                     $fila = $result->fetch_assoc();
-                    if($stmt->fetch()){
-                        if(password_verify($password, $fila["passwd"])){
+                    
+                        if(password_verify($password, $fila["pass"])){
                             // Password is correct, so start a new session
 
                             if(!isset($_SESSION))
@@ -89,7 +89,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     
     // Close connection
     $mysqli->close();
-}
+
 ?>
  
 <!DOCTYPE html>
