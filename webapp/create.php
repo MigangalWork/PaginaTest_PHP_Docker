@@ -1,16 +1,21 @@
 <?php
 // Include config file
 require_once "config/configuracion.php";
+
+//Start session
+
+session_start();
  
 // Define variables and initialize with empty values
-$nombre = $nombrelargo = $fabricante = $numdosis = "";
-$tiempominimo =  $tiempomaximo = "";
-$nombre_err = $nombrelargo_err = $fabricante_err = $numdosis_err ="";
-$tiempominimo_err =  $tiempomaximo_err = "";
+$question = $propietario = $restricciones = $nombre = "";
+$fecha_inicio =  $fecha_final = "";
+$num_questions = 1;
+
  
 // Processing form data when form is submitted
 if($_SERVER["REQUEST_METHOD"] == "POST"){
     // Validate nombre
+    
     $input_nombre = trim($_POST["nombre"]);
     if(empty($input_nombre)){
         $nombre_err = "Please enter a name.";
@@ -19,8 +24,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     } else{
         $nombre = $input_nombre;
     }
-
-    /* Validate nombre_largo
+/*
+     Validate nombre_largo
     $input_nombrelargo = trim($_POST["nombrelargo"]);
     if(empty($input_nombre)){
         $nombrelargo_err = "Please enter a name.";
@@ -40,27 +45,48 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
     $input_question = trim($_POST["question"]);
     if(empty($input_restricciones)){
-        $restricciones_err = "Please enter a restriction";
+        $question_err = "Please enter a question";
     } else{
-        $restricciones = $input_restricciones;
+        $question = $input_question;
     }
-    
+
+    $input_fecha_inicio = trim($_POST["fecha_inicio"]);
+    if(empty($input_fecha_inicio)){
+        $fecha_inicio_err = "Please enter a fecha inicio";
+    } else{
+        $fecha_inicio = $input_fecha_inicio;
+    }
+
+    $input_fecha_final = trim($_POST["fecha_final"]);
+    if(empty($input_fecha_final)){
+        $fecha_final_err = "Please enter a fecha final";
+    } else{
+        $fecha_final = $input_fecha_final;
+    }
+
+    //$input_prop = trim($_POST["prop"]);
+
+    $propietario = $_SESSION["id"];
+
     
     // Check input errors before inserting in database
-    if(empty($nombre_err) && empty($fabricante_err) && empty($nombrelargo_err)&& empty($numdosis_err)){
+    if(empty($restricciones_err) && empty($question_err) && empty($fecha_inicio_err) && empty($fecha_final_err)){
         // Prepare an insert statement
-        $sql = "INSERT INTO encuesta (nombre, restricciones, fecha_inicio, fecha_final, propietario) VALUES (?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO ENCUESTA (id, nombre, restricciones, fecha_inicio, fecha_final, propietario) VALUES (?, ?, ?, ?, ?, ?)";
  
         if($stmt = $mysqli->prepare($sql)){
             // Bind variables to the prepared statement as parameters
-            $stmt->bind_param("sssss", $param_nombre, $param_restricciones);
+            $stmt->bind_param("issssi", $param_id, $param_nombre, $param_restricciones, $param_fecha_inicio, $param_fecha_final, $param_propietario);
             
             // Set parameters
+            $param_id = random_int(0, 1000000);
             $param_nombre = $nombre;
+            $param_question = $question;
             $param_restricciones = $restricciones;
-            $param_fecha_inicio = $fecha_inicio;
-            $param_fecha_final = $fecha_final;
+            $param_fecha_inicio = date("Y-m-d", strtotime($fecha_inicio));
+            $param_fecha_final = date("Y-m-d", strtotime($fecha_final));
             $param_propietario = $propietario;
+
  
 
             
@@ -105,12 +131,33 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     <p>Crea una votacion</p>
                     <form action="<?php echo htmlspecialchars($_SERVER["SCRIPT_NAME"]); ?>" method="post">
                         <div class="form-group">
+                            <label>Nombre</label>
+                            <input type="text" name="nombre" class="form-control <?php echo (!empty($nombre_err)) ? 'is-invalid' : ''; ?>" value="">
+                            <span class="invalid-feedback"><?php echo $nombre_err;?></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Restricciones</label>
+                            <input type="text" name="restricciones" class="form-control <?php echo (!empty($nombre_err)) ? 'is-invalid' : ''; ?>" value="">
+                            <span class="invalid-feedback"><?php echo $nombre_err;?></span>
+                        </div>
+                        <div class="form-group">
+                            <label>fecha inicio</label>
+                            <input type="text" name="fecha_inicio" class="form-control <?php echo (!empty($nombre_err)) ? 'is-invalid' : ''; ?>" value="">
+                            <span class="invalid-feedback"><?php echo $nombre_err;?></span>
+                        </div>
+                        <div class="form-group">
+                            <label>fecha fin</label>
+                            <input type="text" name="fecha_final" class="form-control <?php echo (!empty($nombre_err)) ? 'is-invalid' : ''; ?>" value="">
+                            <span class="invalid-feedback"><?php echo $nombre_err;?></span>
+                        </div>
+                    
+                        <div class="form-group">
                             <label>Pregunta numero 1</label>
-                            <input type="text" name="nombre" class="form-control <?php echo (!empty($nombre_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $nombre; ?>">
+                            <input type="text" name="question" class="form-control <?php echo (!empty($nombre_err)) ? 'is-invalid' : ''; ?>" value="">
                             <span class="invalid-feedback"><?php echo $nombre_err;?></span>
                         </div>
                         <div id = form></div>
-    </br>
+                        </br>
                         <div id = "sub" style = " float: right">
                         <input type="submit" class="btn btn-primary" value="Submit">
                         <a href="listado.php" class="btn btn-secondary ml-2">Cancel</a>
@@ -119,7 +166,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     </form>
                     </br>
                     <div>
-                        <input class="btn btn-secondary" value= "Add question" onclick = "new_question()">
+                        <input class="btn btn-secondary" value= "Add question" onclick = "new_question() <?php $num_questions = $num_questions + 1; ?>">
                     </div>
                     
                 </div>
