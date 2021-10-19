@@ -3,7 +3,7 @@ USE db1;
 
 CREATE TABLE USERS(
 
-    ,
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(40),
     edad int,
     fecha_nac DATE,

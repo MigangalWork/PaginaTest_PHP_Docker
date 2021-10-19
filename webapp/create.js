@@ -7,9 +7,9 @@ function new_question(){
     question.innerHTML = `
     </br>
     <label>Pregunta numero ${num}</label>
-    <input type="text" name="nombre${num}" class="form-control id=${num}<?php echo (!empty($nombre_err)) ? 'is-invalid' : ''; ?>" 
+    <input type="text" name="question${num}" class="form-control id=${num}<?php echo (!empty($question_err)) ? 'is-invalid' : ''; ?>" 
     value="">
-    <span class="invalid-feedback"><?php echo $nombre_err;?></span>
+    <span class="invalid-feedback"><?php echo $question_err;?></span>
 
     `
     document.getElementById("form").appendChild(question);

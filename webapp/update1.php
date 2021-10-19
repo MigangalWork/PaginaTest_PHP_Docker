@@ -11,10 +11,32 @@ $question = $propietario = $restricciones = $nombre = "";
 $fecha_inicio =  $fecha_final = "";
 $num_questions = 1;
 
+$sql = "SELECT SUM(*) FROM preguntas WHERE encuesta = ?";
+
+if($stmt = $mysqli->prepare($sql)){
+    // Bind variables to the prepared statement as parameters
+    $stmt->bind_param("i", $param_id);
+    
+    // Set parameters
+    $id1 = (int)$_GET["q"];
+    $param_id = $id1;
+    
+    // Attempt to execute the prepared statement
+    if($result = $stmt->execute()){
+
+        $num_questions = $result;
+        echo "$result";}
+
+}
+    // Close statement
+    $stmt->close();
+    
+
+
+
  
 // Processing form data when form is submitted
 if($_SERVER["REQUEST_METHOD"] == "POST"){
-    
     // Validate nombre
     
     $input_nombre = trim($_POST["nombre"]);
@@ -37,19 +59,18 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     }*/
     
     // Validate fabricante
+    $input_restricciones = trim($_POST["restricciones"]);
+    if(empty($input_restricciones)){
+        $restricciones_err = "Please enter a restriction";
+    } else{
+        $restricciones = $input_restricciones;
+    }
 
     $input_question = trim($_POST["question"]);
     if(empty($input_restricciones)){
         $question_err = "Please enter a question";
     } else{
         $question = $input_question;
-    }
-
-    $input_restricciones = trim($_POST["restricciones"]);
-    if(empty($input_restricciones)){
-        $restricciones_err = "Please enter a restriction";
-    } else{
-        $restricciones = $input_restricciones;
     }
 
     $input_fecha_inicio = trim($_POST["fecha_inicio"]);
@@ -69,12 +90,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     //$input_prop = trim($_POST["prop"]);
 
     $propietario = $_SESSION["id"];
-    $id = random_int(0, 1000000);
 
     
     // Check input errors before inserting in database
     if(empty($restricciones_err) && empty($nombre_err) && empty($question_err) && empty($fecha_inicio_err) && empty($fecha_final_err)){
-        
         // Prepare an insert statement
         $sql = "INSERT INTO ENCUESTA (id, nombre, restricciones, fecha_inicio, fecha_final, propietario) VALUES (?, ?, ?, ?, ?, ?)";
  
@@ -83,8 +102,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             $stmt->bind_param("issssi", $param_id, $param_nombre, $param_restricciones, $param_fecha_inicio, $param_fecha_final, $param_propietario);
             
             // Set parameters
-            $param_id = $id;
+            $param_id = random_int(0, 1000000);
             $param_nombre = $nombre;
+            $param_question = $question;
             $param_restricciones = $restricciones;
             $param_fecha_inicio = date("Y-m-d", strtotime($fecha_inicio));
             $param_fecha_final = date("Y-m-d", strtotime($fecha_final));
@@ -96,7 +116,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             // Attempt to execute the prepared statement
             if($stmt->execute()){
                 // Records created successfully. Redirect to landing page
-                
+                header("location: listado.php");
+                exit();
             } else{
                 echo "Oops! Algo fue mal. Please try again later.";
             }
@@ -104,47 +125,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
          
         // Close statement
         $stmt->close();
-
-        for ($i = $num_questions; $i > 1; $i-- ){
-            $question_num = "question" . $i;
-            $input_question = trim($_POST["question"]);
-            $question = $input_question;
-            
-            $sql = "INSERT INTO PREGUNTAS (id, pregunta, encuesta) VALUES (?, ?, ?)";
- 
-            if($stmt = $mysqli->prepare($sql)){
-                // Bind variables to the prepared statement as parameters
-                $stmt->bind_param("isi", $param_id, $param_question, $param_encuesta);
-                
-                // Set parameters
-                $param_id = random_int(0, 1000000);
-                $param_encuesta = $id;
-                $param_question = $question;
-            }
-                
-                // Attempt to execute the prepared statement
-                if($stmt->execute()){
-                    // Records created successfully. Redirect to landing page
-                    
-                } else{
-                    echo "Oops! Algo fue mal. Please try again later.";
-                }
-
-                // Close statement
-                $stmt->close();
-
-        }
-
-        // Close connection
-    $mysqli->close();
-
-    header("location: listado.php");
-    exit();
     }
-
     
-    
-    
+    // Close connection
+    $mysqli->close();
 }
 ?>
  
