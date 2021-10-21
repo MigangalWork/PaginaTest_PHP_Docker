@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   web:
-    image: php-apache-mysql:8.0-xdebug3.0
+    image: httpd
     container_name: servidor-web
     ports:
       - 80:80
@@ -19,7 +19,7 @@ services:
     image: 'mysql'
     container_name: servidor-mysql
     ports: 
-      - 3306:3306
+      - 3307:3307
     command: --default-authentication-plugin=mysql_native_password
     environment:
       MYSQL_ROOT_PASSWORD: admin
