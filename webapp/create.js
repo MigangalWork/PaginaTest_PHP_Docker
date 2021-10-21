@@ -13,5 +13,23 @@ function new_question(){
 
     `
     document.getElementById("form").appendChild(question);
+    update_en(num);
     
 }
+
+function update_en(id){
+    var xhttp
+    xhttp = new XMLHttpRequest();
+    
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+        
+        }
+      };
+
+    var ids = id.toString();
+
+    xhttp.open("GET", "update_questions.php?q="+ids, true);
+    xhttp.send();
+    
+  }

@@ -10,10 +10,15 @@ session_start();
 $question = $propietario = $restricciones = $nombre = "";
 $fecha_inicio =  $fecha_final = "";
 $num_questions = 1;
+$_SESSION["num_questions"] = 1;
 
  
 // Processing form data when form is submitted
 if($_SERVER["REQUEST_METHOD"] == "POST"){
+
+
+    $num_questions = $_SESSION["num_questions"];
+    
     
     // Validate nombre
     
@@ -37,18 +42,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     }*/
     
     // Validate fabricante
-
-    $input_question = trim($_POST["question"]);
-    if(empty($input_restricciones)){
-        $question_err = "Please enter a question";
-    } else{
-        $question = $input_question;
-    }
-
+    
     $input_restricciones = trim($_POST["restricciones"]);
     if(empty($input_restricciones)){
         $restricciones_err = "Please enter a restriction";
     } else{
+        
         $restricciones = $input_restricciones;
     }
 
@@ -84,6 +83,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             
             // Set parameters
             $param_id = $id;
+
             $param_nombre = $nombre;
             $param_restricciones = $restricciones;
             $param_fecha_inicio = date("Y-m-d", strtotime($fecha_inicio));
@@ -95,51 +95,67 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             
             // Attempt to execute the prepared statement
             if($stmt->execute()){
-                // Records created successfully. Redirect to landing page
+                
+                /*
+                
+                 Records created successfully. Redirect to landing page*/
                 
             } else{
                 echo "Oops! Algo fue mal. Please try again later.";
             }
-        }
+        
          
         // Close statement
         $stmt->close();
-
-        for ($i = $num_questions; $i > 1; $i-- ){
-            $question_num = "question" . $i;
-            $input_question = trim($_POST["question"]);
-            $question = $input_question;
-            
-            $sql = "INSERT INTO PREGUNTAS (id, pregunta, encuesta) VALUES (?, ?, ?)";
- 
-            if($stmt = $mysqli->prepare($sql)){
-                // Bind variables to the prepared statement as parameters
-                $stmt->bind_param("isi", $param_id, $param_question, $param_encuesta);
-                
-                // Set parameters
-                $param_id = random_int(0, 1000000);
-                $param_encuesta = $id;
-                $param_question = $question;
-            }
-                
-                // Attempt to execute the prepared statement
-                if($stmt->execute()){
-                    // Records created successfully. Redirect to landing page
-                    
-                } else{
-                    echo "Oops! Algo fue mal. Please try again later.";
-                }
-
-                // Close statement
-                $stmt->close();
-
         }
 
-        // Close connection
-    $mysqli->close();
+        for ($i = $num_questions; $i > 0; $i-- ){
 
-    header("location: listado.php");
-    exit();
+            $question_num = "question" . $i;
+            $input_question = trim($_POST[$question_num]);
+            if(empty($input_question)){
+                $question_err = "Please enter a question";
+            } else{
+                $question = $input_question;
+            }
+            
+            if(empty($question_err)){
+            
+                $sql = "INSERT INTO PREGUNTAS (id, pregunta, encuesta) VALUES (?, ?, ?)";
+    
+                if($stmt = $mysqli->prepare($sql)){
+                    // Bind variables to the prepared statement as parameters
+                    $stmt->bind_param("isi", $param_id, $param_question, $param_encuesta);
+                    
+                    // Set parameters
+                    $param_id = random_int(0, 1000000);
+                    $param_encuesta = $id;
+                    $param_question = $question;
+                }
+                    
+                    // Attempt to execute the prepared statement
+                    if($stmt->execute()){
+                        // Records created successfully. Redirect to landing page
+                        
+                    } else{
+                        echo "Oops! Algo fue mal. Please try again later.";
+                    }
+
+                    // Close statement
+                    $stmt->close();
+
+            }
+        }
+
+        
+
+        // Close connection
+        $mysqli->close();
+
+        header("location: listado.php");
+        exit();
+
+        
     }
 
     
@@ -192,7 +208,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     
                         <div class="form-group">
                             <label>Pregunta numero 1</label>
-                            <input type="text" name="question" class="form-control <?php echo (!empty($nombre_err)) ? 'is-invalid' : ''; ?>" value="">
+                            <input type="text" name="question1" class="form-control <?php echo (!empty($nombre_err)) ? 'is-invalid' : ''; ?>" value="">
                             <span class="invalid-feedback"><?php echo $nombre_err;?></span>
                         </div>
                         <div id = form></div>
@@ -205,7 +221,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     </form>
                     </br>
                     <div>
-                        <input type = "button" class="btn btn-secondary" value= "Add question" onclick = "new_question() <?php $num_questions = $num_questions + 1; ?>">
+                        <input type = "button" class="btn btn-secondary" value= "Add question" onclick = "new_question()">
                     </div>
                     
                 </div>

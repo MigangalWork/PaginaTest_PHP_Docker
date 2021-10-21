@@ -1,4 +1,8 @@
 <?php
 
-$_SESSION['encuesta'] = $_GET['q'];
+session_start();
+
+$_SESSION["encuesta"] = $_GET['q'];
+
+
 ?>
