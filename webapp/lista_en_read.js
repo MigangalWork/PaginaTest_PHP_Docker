@@ -8,9 +8,8 @@ function new_question(name){
     question.className = "form-group";
     question.innerHTML = `
     </br>
-    <label>${name}</label>
-    <input type="text" name="question${num}" class="form-control id=${num}" 
-    value="question${num}">
+    <label>Respuesta:</label>
+    <lable>${name}</lable>
 
     `
     document.getElementById("form").appendChild(question);

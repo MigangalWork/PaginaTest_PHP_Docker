@@ -10,16 +10,16 @@ function new_question(name){
     </br>
     <label>${name}</label>
     <input type="text" name="question${num}" class="form-control id=${num}" 
-    value="question${num}">
+    value="">
 
     `
     document.getElementById("form").appendChild(question);
     
-    update_p(num);
+    update_en(num);
     
   }
   
-  function update_p(id){
+  function update_en(id){
       var xhttp
       xhttp = new XMLHttpRequest();
       
@@ -36,13 +36,13 @@ function create_list(id, name){
     div.setAttribute("class", "form-group");
     div.setAttribute("id", `${id}`);
 
-
     var label = document.createElement("label");
-    label.innerHTML = name;
+    label.innerHTML = "Pregunta";
 
     var input = document.createElement("input");
     input.setAttribute("type", "text");
     input.setAttribute("class", "form-control");
+    input.setAttribute("value", `${name}`);
   
 
     /*<div class="form-group">
@@ -52,7 +52,6 @@ function create_list(id, name){
 </div>*/
     
     
-
     div.appendChild(label);
     div.appendChild(input);
 
@@ -89,5 +88,5 @@ function delete_en(id) {
     var ids = id.toString();
     xhttp.open("GET", "update_session.php?q="+ids, true);
     xhttp.send();
-    window.location.href='/update1.php'
+    
   }

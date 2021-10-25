@@ -1,31 +1,38 @@
 <?php
 
-                    session_start(); 
+                    
 
                     require_once "config/configuracion.php";
 
-                    $num_questions = 1;
+                    session_start(); 
+                    
+
+                    
+
+
+                    $id_encuesta = intval($_SESSION["encuesta"]);
+
+                    
                     
                     if($_SERVER["REQUEST_METHOD"] == "POST"){
                     
                         $propietario = $_SESSION["id"];
-                        $id = random_int(0, 1000000);
+                        
+                        
                     
                         
                     
-                            for ($i = $num_questions; $i > 0; $i-- ){
+                            for ($i = $_SESSION["num_questions"]; $i > 0; $i-- ){
+                                
+                                
+
+                                $id = $_SESSION["preguntas"][$i];
+                                
                     
                                 $question_num = "question" . $i;
                                 $input_question = trim($_POST[$question_num]);
-                                if(empty($input_question)){
-                                    $question_err = "Please enter a question";
-                                } else{
-                                    $question = $input_question;
-                                }
-                                
-                                if(empty($question_err)){
-                                
-                                    $sql = "INSERT INTO PREGUNTAS (id, pregunta, encuesta) VALUES (?, ?, ?)";
+
+                                    $sql = "INSERT INTO respuestas (id, respuesta, pregunta) VALUES (?, ?, ?)";
                         
                                     if($stmt = $mysqli->prepare($sql)){
                                         // Bind variables to the prepared statement as parameters
@@ -34,8 +41,9 @@
                                         // Set parameters
                                         $param_id = random_int(0, 1000000);
                                         $param_encuesta = $id;
-                                        $param_question = $question;
-                                    }
+                                        $param_question = $input_question;
+                                        
+                                    
                                         
                                         // Attempt to execute the prepared statement
                                         if($stmt->execute()){
@@ -44,11 +52,13 @@
                                         } else{
                                             echo "Oops! Algo fue mal. Please try again later.";
                                         }
+                                        $stmt->close();
+                                    }
                     
                                         // Close statement
-                                        $stmt->close();
+                                        
                     
-                                }
+                                
                             }
                     
                             
@@ -101,43 +111,51 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
-                    <h2 class="mt-5">Crear Votacion</h2>
-                    <p>Crea una votacion</p>
+                    <h2 class="mt-5">Responder Encuesta</h2>
+                    
                     <form action="<?php echo htmlspecialchars($_SERVER["SCRIPT_NAME"]); ?>" method="post">
                         
                         <div id = form></div>
                         </br>
                         <div id = "sub" style = " float: right">
                         <input type="submit" class="btn btn-primary" value="Submit">
-                        <a href="listado.php" class="btn btn-secondary ml-2">Cancel</a>
+                        <a href="listado_encuestas_resp.php" class="btn btn-secondary ml-2">Cancel</a>
                         </div>
  
                     </form>
                 
                     <?php
 
+                    $_SESSION["preguntas"] = array();
+                    $num = 1;
+
                    
                     
                     
                     
                     // Attempt select query execution
-                    $id_encuesta = intval($_SESSION["encuesta"]);
-                    $id_encuesta = (int)($_SESSION["encuesta"]);
+                    
+                    $_SESSION["num_questions"] = 0;
                     $sql = "SELECT * FROM preguntas WHERE encuesta = $id_encuesta";
                     if($result = $mysqli->query($sql)){
                         if($result->num_rows > 0){
                             
                                 while($row = $result->fetch_array()){
 
-                                    $num_questions = $num_questions + 1;
+                                    $_SESSION["num_questions"] = $_SESSION["num_questions"] + 1;
+                                    
                                    
                                     $row_val = $row["pregunta"];
                                     $row_id = $row["id"];
+                                    $_SESSION["preguntas"][$num] = $row_id;
+                                    
                                     //echo '<button type="button" class="btn btn-primaryt" onclick="create_list($row)">Mostrar listas</button>';
                                     $list = "<script> new_question('$row_val')</script>";
                                     //$list = '<script> create_list("hola")</script>';
             
                                     echo $list;
+
+                                    $num++;
 
                                     //create_list($row["nombre"]);
                                 }

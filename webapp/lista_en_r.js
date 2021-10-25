@@ -4,7 +4,7 @@ function create_list(id, name){
     div.setAttribute("class", "container sm-4");
     div.setAttribute("id", `${id}`);
     var name0 = document.createElement("h1");
-    name0.innerHTML = name
+    name0.innerHTML = name;
     var but1 = document.createElement("button");
     but1.setAttribute("onclick", `update_en(${id})`);
     but1.setAttribute("type", "submit");
@@ -51,5 +51,8 @@ function delete_en(id) {
     var ids = id.toString();
     xhttp.open("GET", "update_session.php?q="+ids, true);
     xhttp.send();
-    window.location.href='/respond.php';
+    let nuevaURL = 'respond.php'; // La URL de destino.
+    let espera   =  1;
+    espera = parseInt(espera);
+    setTimeout('location.href="'+nuevaURL+'"', espera*1000);
   }

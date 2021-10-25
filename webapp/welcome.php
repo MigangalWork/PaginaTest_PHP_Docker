@@ -27,6 +27,7 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     </p>
     <a href="create.php" class="btn btn-warning">Crear cosas</a>;
     <a href="listado_encuestas_resp.php" class="btn btn-warning">Hacer encuestas</a>;
+    <a href="listado.php" class="btn btn-warning">Listado</a>;
 
 </body>
 </html>

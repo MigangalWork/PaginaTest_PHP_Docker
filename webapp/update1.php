@@ -7,6 +7,8 @@ require_once "config/configuracion.php";
 session_start();
  
 // Define variables and initialize with empty values
+$encuesta = intval($_SESSION["encuesta"]);
+
 $question = $propietario = $restricciones = $nombre = "";
 $fecha_inicio =  $fecha_final = "";
 $num_questions = 1;
@@ -18,19 +20,39 @@ if($stmt = $mysqli->prepare($sql)){
     $stmt->bind_param("i", $param_id);
     
     // Set parameters
-    $id1 = (int)$_GET["q"];
+    $id1 = $encuesta;
     $param_id = $id1;
     
     // Attempt to execute the prepared statement
     if($result = $stmt->execute()){
 
         $num_questions = $result;
-        echo "$result";}
+        
 
-}
-    // Close statement
     $stmt->close();
+
+}}
+    // Close statement
     
+    $sql = "SELECT nombre FROM encuestas WHERE encuesta = ?";
+
+    if($stmt = $mysqli->prepare($sql)){
+        // Bind variables to the prepared statement as parameters
+        $stmt->bind_param("i", $param_id);
+        
+        // Set parameters
+        $id1 = $encuesta;
+        $param_id = $id1;
+        
+        // Attempt to execute the prepared statement
+        if($result = $stmt->execute()){
+    
+            $nombre = $result;
+            }
+    
+        $stmt->close();
+    
+    }    
 
 
 
@@ -127,8 +149,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $stmt->close();
     }
     
-    // Close connection
-    $mysqli->close();
+    
 }
 ?>
  
@@ -155,30 +176,72 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     <form action="<?php echo htmlspecialchars($_SERVER["SCRIPT_NAME"]); ?>" method="post">
                         <div class="form-group">
                             <label>Nombre</label>
-                            <input type="text" name="nombre" class="form-control <?php echo (!empty($nombre_err)) ? 'is-invalid' : ''; ?>" value="">
+                            <input type="text" name="nombre" class="form-control <?php echo (!empty($nombre_err)) ? 'is-invalid' : ''; ?>" value="<?php echo ($nombre) ?>">
                             <span class="invalid-feedback"><?php echo $nombre_err;?></span>
                         </div>
                         <div class="form-group">
                             <label>Restricciones</label>
-                            <input type="text" name="restricciones" class="form-control <?php echo (!empty($nombre_err)) ? 'is-invalid' : ''; ?>" value="">
+                            <input type="text" name="restricciones" class="form-control <?php echo (!empty($nombre_err)) ? 'is-invalid' : ''; ?>" value="<?php echo ($restricciones) ?>">
                             <span class="invalid-feedback"><?php echo $nombre_err;?></span>
                         </div>
                         <div class="form-group">
                             <label>fecha inicio</label>
-                            <input type="date" name="fecha_inicio" class="form-control <?php echo (!empty($nombre_err)) ? 'is-invalid' : ''; ?>" value="">
+                            <input type="date" name="fecha_inicio" class="form-control <?php echo (!empty($nombre_err)) ? 'is-invalid' : ''; ?>" value="<?php echo ($fecha_inicio) ?>">
                             <span class="invalid-feedback"><?php echo $nombre_err;?></span>
                         </div>
                         <div class="form-group">
                             <label>fecha fin</label>
-                            <input type="date" name="fecha_final" class="form-control <?php echo (!empty($nombre_err)) ? 'is-invalid' : ''; ?>" value="">
+                            <input type="date" name="fecha_final" class="form-control <?php echo (!empty($nombre_err)) ? 'is-invalid' : ''; ?>" value="<?php echo ($fecha_final) ?>">
                             <span class="invalid-feedback"><?php echo $nombre_err;?></span>
                         </div>
+                        <div class="form-group" id = "result">
+                            <label>fecha fin</label>
+                            <input type="date" name="fecha_final" class="form-control <?php echo (!empty($nombre_err)) ? 'is-invalid' : ''; ?>" value="<?php echo ($fecha_final) ?>">
+                            <span class="invalid-feedback"><?php echo $nombre_err;?></span>
+                        </div>
+
+                        <script src="lista_en_u.js"></script>
+
+
+                        <?php
+
+                   
+                    // Include config file
                     
-                        <div class="form-group">
-                            <label>Pregunta numero 1</label>
-                            <input type="text" name="question" class="form-control <?php echo (!empty($nombre_err)) ? 'is-invalid' : ''; ?>" value="">
-                            <span class="invalid-feedback"><?php echo $nombre_err;?></span>
-                        </div>
+                    
+                    // Attempt select query execution
+                    $id_user = $_SESSION["id"];
+                    $sql = "SELECT * FROM preguntas WHERE encuesta = $encuesta";
+                    if($result = $mysqli->query($sql)){
+                        if($result->num_rows > 0){
+                            
+                                while($row = $result->fetch_array()){
+                                   
+                                    $row_val = $row["pregunta"];
+                                    $row_id = $row["id"];
+                                    //echo '<button type="button" class="btn btn-primaryt" onclick="create_list($row)">Mostrar listas</button>';
+                                    $list = "<script> create_list('$row_id', '$row_val')</script>";
+                                    //$list = '<script> create_list("hola")</script>';
+            
+                                    echo $list;
+
+                                    //create_list($row["nombre"]);
+                                }
+                            
+                            // Free result set
+                            $result->free();
+                        } else{
+                            echo '<div class="alert alert-danger"><em>No se encontraron registros.</em></div>';
+                        }
+                    } else{
+                        echo "Oops! Algo fue mal. Please try again later.";
+                    }
+                    
+                    // Close connection
+                    $mysqli->close();
+                    ?>
+                    
+                        
                         <div id = form></div>
                         </br>
                         <div id = "sub" style = " float: right">
@@ -188,9 +251,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
  
                     </form>
                     </br>
-                    <div>
-                        <input type = "button" class="btn btn-secondary" value= "Add question" onclick = "new_question() <?php $num_questions = $num_questions + 1; ?>">
-                    </div>
+                    
                     
                 </div>
             </div>        

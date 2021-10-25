@@ -2,7 +2,7 @@
 
 session_start();
 
-$_SESSION["num_questions"] = $_GET['q'];
+$_SESSION["num_questions"] = $_GET["q"];
 
 
 ?>

@@ -1,16 +1,27 @@
 <?php
 // Include config file
+
 require_once "config/configuracion.php";
 
 //Start session
 
 session_start();
+
+setcookie("preguntas_hechas", 0, [
+    'expires' => time() + 3600,
+    'path' => '/',
+    'domain' => 'localhost',
+    'secure' => true,
+    'httponly' => true,
+    'samesite' => 'Lax',
+]);
  
 // Define variables and initialize with empty values
 $question = $propietario = $restricciones = $nombre = "";
 $fecha_inicio =  $fecha_final = "";
 $num_questions = 1;
-$_SESSION["num_questions"] = 1;
+//$_SESSION["num_questions"] = 1;
+$_SESSION["encuesta"] = "";
 
  
 // Processing form data when form is submitted
@@ -69,6 +80,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
     $propietario = $_SESSION["id"];
     $id = random_int(0, 1000000);
+    $_SESSION["encuesta"] = $id;
 
     
     // Check input errors before inserting in database

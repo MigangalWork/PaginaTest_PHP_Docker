@@ -2,13 +2,57 @@
 // Include config file
 require_once "config/configuracion.php";
 
+//set cookies
+
+setcookie("usuarios_creados", 0, [
+    'expires' => time() + 120,
+    'path' => '/',
+    'domain' => 'localhost',
+    'secure' => true,
+    'httponly' => true,
+    'samesite' => 'Lax',
+]);
+
+setcookie("acepted", false, [
+    'expires' => time() + 120,
+    'path' => '/',
+    'domain' => 'localhost',
+    'secure' => true,
+    'httponly' => true,
+    'samesite' => 'Lax',
+]);
+
+
 // Define variables and initialize with empty values
 $email = $password = $confirm_password = "";
 $email_err = $password_err = $confirm_password_err = "";
 
+
+//Cookies
+
+echo('<script>window.confirm("¿Quiere aceptar las Cookies")</script>'); 
+
+
+/*
+if($_COOKIE["acepted"]){
+
+}else{
+    echo("<script src='create.js'> 
+    
+    </script>
+    <script> cookies();> 
+    
+    </script>");
+}*/
+
+
+
 // Processing form data when form is submitted
 if($_SERVER["REQUEST_METHOD"] == "POST"){
-
+    if ($_COOKIE["usuarios_creados"] > 3){
+        echo '<div class="alert alert-danger"><em>Demasiados usuarios seguidos.</em></div>';
+        exit();
+    }
     // Validate username
     if(empty(trim($_POST["email"]))){
         $email_err = "Please enter a username.";
@@ -81,7 +125,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             // Attempt to execute the prepared statement
             if($stmt->execute()){
                 // Redirect to login page
-                header("location: login.php");
+                
+                $_COOKIE["usuarios_creados"] = $_COOKIE["usuarios_creados"] + 1;
+                header("location: index.php");
             } else{
                 echo "Oops! Something went wrong. Please try again later.";
             }
@@ -109,6 +155,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 </head>
 <body>
 <div class="wrapper">
+    
     <h2>Registro</h2>
     <p>Please fill this form to create an account.</p>
     <form action="<?php echo htmlspecialchars($_SERVER["SCRIPT_NAME"]); ?>" method="post">
@@ -131,7 +178,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             <input type="submit" class="btn btn-primary" value="Submit">
             <input type="reset" class="btn btn-secondary ml-2" value="Reset">
         </div>
-        <p>Already have an account? <a href="login.php">Login here</a>.</p>
+        <p>Already have an account? <a href="index.php">Login here</a>.</p>
     </form>
 </div>
 </body>
